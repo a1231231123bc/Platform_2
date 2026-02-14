@@ -1,4 +1,4 @@
-# Реализация Этапов 1-9
+# Реализация Этапов 1-10
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -329,4 +329,37 @@ make test
 
 - `internal/dto/assignment_test.go`
   - валидация DTO create/updateStatus
+- `go test ./...` — PASS
+
+## Этап 10: Рейтинги (ratings)
+
+### Что реализовано
+
+- `internal/dto/rating.go`
+  - `CreateRatingRequest`
+- `internal/repository/rating.go`
+  - создание рейтинга
+  - список рейтингов по подрядчику (scope организации)
+  - список рейтингов по работе (scope организации)
+- `internal/service/ratings.go`
+  - проверка существования job/contractor
+  - create/list по contractor/list по job
+- `internal/handler/ratings.go`
+  - create/list endpoints
+
+### Эндпоинты
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| POST | `/ratings` | JWT + role | Создать рейтинг |
+| GET | `/ratings/contractor/{contractorId}` | JWT | Рейтинги подрядчика |
+| GET | `/ratings/job/{jobId}` | JWT | Рейтинги по работе |
+
+`role` для mutate-операций: `ADMIN | MANAGER`.
+
+### Тесты
+
+- `internal/dto/rating_test.go`
+  - валидация DTO create
+  - валидация диапазона score
 - `go test ./...` — PASS
