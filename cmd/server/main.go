@@ -70,6 +70,7 @@ func main() {
 	ratingsHandler := handler.NewRatingsHandler(ratingsService)
 	complianceHandler := handler.NewComplianceHandler(complianceService)
 	analyticsHandler := handler.NewAnalyticsHandler(analyticsService)
+	swaggerHandler := handler.NewSwaggerHandler()
 
 	r := router.New(router.Deps{
 		AuthHandler:          authHandler,
@@ -83,6 +84,7 @@ func main() {
 		RatingsHandler:       ratingsHandler,
 		ComplianceHandler:    complianceHandler,
 		AnalyticsHandler:     analyticsHandler,
+		SwaggerHandler:       swaggerHandler,
 		JWTSecret:            cfg.JWTSecret,
 	})
 

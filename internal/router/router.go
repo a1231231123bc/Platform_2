@@ -23,6 +23,7 @@ type Deps struct {
 	RatingsHandler       *handler.RatingsHandler
 	ComplianceHandler    *handler.ComplianceHandler
 	AnalyticsHandler     *handler.AnalyticsHandler
+	SwaggerHandler       *handler.SwaggerHandler
 	JWTSecret            string
 }
 
@@ -35,6 +36,8 @@ func New(deps Deps) *chi.Mux {
 	r.Use(corsMiddleware)
 
 	r.Get("/", healthCheck)
+	r.Get("/api/docs/", deps.SwaggerHandler.UI)
+	r.Get("/api/docs/swagger.json", deps.SwaggerHandler.JSON)
 
 	// Auth routes (public)
 	r.Post("/auth/register", deps.AuthHandler.Register)

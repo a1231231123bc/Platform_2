@@ -1,4 +1,4 @@
-# Реализация Этапов 1-13
+# Реализация Этапов 1-14
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -442,4 +442,33 @@ make test
 
 - `internal/repository/analytics_test.go`
   - проверка JSON-контракта ответа метрик
+- `go test ./...` — PASS
+
+## Этап 14: Swagger и финальная документация
+
+### Что реализовано
+
+- `internal/apidocs/spec.go`
+  - минимальный OpenAPI JSON (`SwaggerJSON`)
+  - HTML-страница документации (`SwaggerHTML`)
+- `internal/handler/swagger.go`
+  - `JSON`
+  - `UI`
+- интеграция в `internal/router/router.go`
+  - `GET /api/docs/`
+  - `GET /api/docs/swagger.json`
+- интеграция в `cmd/server/main.go` (DI wiring)
+- финальный `README.md` в корне проекта
+
+### Эндпоинты
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| GET | `/api/docs/` | - | HTML-страница документации |
+| GET | `/api/docs/swagger.json` | - | OpenAPI JSON |
+
+### Тесты
+
+- `internal/router/router_test.go`
+  - `TestSwaggerJSONEndpoint` (валидный JSON + поле `openapi`)
 - `go test ./...` — PASS
