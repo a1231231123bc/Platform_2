@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: platform
+      POSTGRES_PASSWORD: platform_secret
+      POSTGRES_DB: platform
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U platform -d platform"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://platform:platform_secret@db:5432/platform?sslmode=disable
+      JWT_SECRET: change-me-in-production-very-secret-key
+      JWT_EXPIRES_IN: 168h
+      PORT: 3000
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  verifier:
+    build:
+      context: .
+      dockerfile: Dockerfile.verifier
+    environment:
+      BASE_URL: http://api:3000
+      DB_URL: postgresql://platform:platform_secret@db:5432/platform?sslmode=disable
+      SMOKE_LOG_FILE: /tmp/smoke_api.log
+    depends_on:
+      api:
+        condition: service_healthy

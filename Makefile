@@ -2,7 +2,7 @@ GO := /usr/local/go/bin/go
 APP_NAME := platform-server
 BUILD_DIR := ./bin
 
-.PHONY: run build test test-cover lint migrate-up migrate-down clean
+.PHONY: run build test test-cover lint migrate-up migrate-down clean tidy docker-verify
 
 run:
 	$(GO) run ./cmd/server/
@@ -25,3 +25,11 @@ clean:
 
 tidy:
 	$(GO) mod tidy
+
+docker-verify:
+	@set +e; \
+	docker compose down -v --remove-orphans >/dev/null 2>&1; \
+	docker compose up --build --abort-on-container-exit --exit-code-from verifier verifier; \
+	status=$$?; \
+	docker compose down -v --remove-orphans; \
+	exit $$status

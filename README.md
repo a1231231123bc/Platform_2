@@ -30,7 +30,22 @@ make test-cover
 make lint
 make migrate-up
 make migrate-down
+make docker-verify
 ```
+
+## One-Command Verification (Docker)
+
+```bash
+make docker-verify
+```
+
+What it does:
+- starts PostgreSQL in Docker
+- starts API container
+- runs `go test ./...`
+- runs end-to-end smoke requests across all implemented endpoints
+- exits non-zero if any check fails
+- tears down all containers/volumes after run
 
 ## Docs
 

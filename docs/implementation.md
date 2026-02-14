@@ -459,6 +459,13 @@ make test
   - `GET /api/docs/swagger.json`
 - интеграция в `cmd/server/main.go` (DI wiring)
 - финальный `README.md` в корне проекта
+- контейнерный контур проверки:
+  - `Dockerfile`
+  - `Dockerfile.verifier`
+  - `docker-compose.yml`
+  - `scripts/verify_all.sh`
+  - `scripts/smoke_api.sh`
+  - `make docker-verify`
 
 ### Эндпоинты
 
@@ -472,3 +479,17 @@ make test
 - `internal/router/router_test.go`
   - `TestSwaggerJSONEndpoint` (валидный JSON + поле `openapi`)
 - `go test ./...` — PASS
+
+### Автопроверка перед стартом работы
+
+Одна команда:
+
+```bash
+make docker-verify
+```
+
+Выполняет:
+- подъем PostgreSQL и API в Docker
+- unit-тесты (`go test ./...`)
+- smoke-прогон HTTP-ручек (public + protected + role-protected + responses)
+- остановку и очистку контейнеров после завершения
