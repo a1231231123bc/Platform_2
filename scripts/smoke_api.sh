@@ -11,6 +11,11 @@ trim() {
   tr -d '[:space:]'
 }
 
+sql_scalar() {
+  local sql="$1"
+  psql "$DB_URL" -v ON_ERROR_STOP=1 -AtqX -c "$sql" | head -n1 | trim
+}
+
 request() {
   local method="$1"; shift
   local path="$1"; shift
@@ -74,7 +79,7 @@ request PATCH "/users/${USER_ID}" '{"name":"QA Admin Updated"}' "$TOKEN" >/dev/n
 request GET "/organizations/${ORG_ID}" "" "$TOKEN" >/dev/null
 request PATCH "/organizations/${ORG_ID}" '{"name":"QA Org Updated"}' "$TOKEN" >/dev/null
 
-EXTRA_USER_ID=$(psql "$DB_URL" -Atc "INSERT INTO users(email,password_hash,name,role,organization_id) VALUES ('qa-user@example.com','x','QA User','MANAGER','$ORG_ID') RETURNING id;" | trim)
+EXTRA_USER_ID=$(sql_scalar "INSERT INTO users(email,password_hash,name,role,organization_id) VALUES ('qa-user@example.com','x','QA User','MANAGER','$ORG_ID') RETURNING id;")
 request DELETE "/users/${EXTRA_USER_ID}" "" "$TOKEN" >/dev/null
 
 contractor_resp=$(request POST "/contractors" '{"name":"Contractor One","phone":"+79990000002","type":"INDIVIDUAL","regions":["Moscow"],"equipmentTypes":["Excavator"],"consentGiven":true}' "$TOKEN")
@@ -109,9 +114,9 @@ request GET "/compliance/blacklist" "" "$TOKEN" >/dev/null
 request DELETE "/compliance/blacklist/${BLACKLIST_ID}" "" "$TOKEN" >/dev/null
 request GET "/analytics/dashboard" "" "$TOKEN" >/dev/null
 
-DISPATCH_ID=$(psql "$DB_URL" -Atc "INSERT INTO job_dispatches(job_id,wave,status,\"limit\") VALUES ('$JOB_ID',1,'PENDING',10) RETURNING id;" | trim)
-TOKEN_A=$(psql "$DB_URL" -Atc "INSERT INTO job_offers(job_id,dispatch_id,contractor_id,status) VALUES ('$JOB_ID','$DISPATCH_ID','$CONTRACTOR_ID','SENT') RETURNING token;" | trim)
-TOKEN_D=$(psql "$DB_URL" -Atc "INSERT INTO job_offers(job_id,dispatch_id,contractor_id,status) VALUES ('$DUP_JOB_ID','$DISPATCH_ID','$CONTRACTOR_ID','SENT') RETURNING token;" | trim)
+DISPATCH_ID=$(sql_scalar "INSERT INTO job_dispatches(job_id,wave,status,\"limit\") VALUES ('$JOB_ID',1,'PENDING',10) RETURNING id;")
+TOKEN_A=$(sql_scalar "INSERT INTO job_offers(job_id,dispatch_id,contractor_id,status) VALUES ('$JOB_ID','$DISPATCH_ID','$CONTRACTOR_ID','SENT') RETURNING token;")
+TOKEN_D=$(sql_scalar "INSERT INTO job_offers(job_id,dispatch_id,contractor_id,status) VALUES ('$DUP_JOB_ID','$DISPATCH_ID','$CONTRACTOR_ID','SENT') RETURNING token;")
 
 request GET "/responses/${TOKEN_A}" >/dev/null
 request POST "/responses/${TOKEN_A}/accept" >/dev/null
