@@ -1,4 +1,4 @@
-# Реализация Этапов 1-8
+# Реализация Этапов 1-9
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -295,4 +295,38 @@ make test
 
 - `internal/service/responses_test.go`
   - проверка бизнес-правила respondable status (`SENT` only)
+- `go test ./...` — PASS
+
+## Этап 9: Назначения (assignments)
+
+### Что реализовано
+
+- `internal/dto/assignment.go`
+  - `CreateAssignmentRequest`
+  - `UpdateAssignmentStatusRequest`
+- `internal/repository/assignment.go`
+  - создание назначения
+  - получение назначений по `jobId` в scope организации
+  - обновление статуса в scope организации
+- `internal/service/assignments.go`
+  - проверки существования job и contractor
+  - обработка конфликтов (`job_id + contractor_id` unique)
+  - обновление статуса назначения
+- `internal/handler/assignments.go`
+  - endpoints для create/list/updateStatus
+
+### Эндпоинты
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| POST | `/assignments` | JWT + role | Создать назначение |
+| GET | `/assignments/job/{jobId}` | JWT | Список назначений по работе |
+| PATCH | `/assignments/{id}/status` | JWT + role | Обновить статус назначения |
+
+`role` для mutate-операций: `ADMIN | MANAGER`.
+
+### Тесты
+
+- `internal/dto/assignment_test.go`
+  - валидация DTO create/updateStatus
 - `go test ./...` — PASS

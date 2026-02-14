@@ -43,6 +43,7 @@ func main() {
 	blacklistRepo := repository.NewContractorBlacklistRepository(pool)
 	jobRepo := repository.NewJobRepository(pool)
 	jobOfferRepo := repository.NewJobOfferRepository(pool)
+	assignmentRepo := repository.NewAssignmentRepository(pool)
 
 	authService := service.NewAuthService(userRepo, orgRepo, cfg)
 	usersService := service.NewUsersService(userRepo)
@@ -51,6 +52,7 @@ func main() {
 	jobsService := service.NewJobsService(jobRepo)
 	matchingService := service.NewMatchingService(jobRepo, contractorRepo)
 	responsesService := service.NewResponsesService(jobOfferRepo)
+	assignmentsService := service.NewAssignmentsService(assignmentRepo, jobRepo, contractorRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
 	usersHandler := handler.NewUsersHandler(usersService)
@@ -59,6 +61,7 @@ func main() {
 	jobsHandler := handler.NewJobsHandler(jobsService)
 	matchingHandler := handler.NewMatchingHandler(matchingService)
 	responsesHandler := handler.NewResponsesHandler(responsesService)
+	assignmentsHandler := handler.NewAssignmentsHandler(assignmentsService)
 
 	r := router.New(router.Deps{
 		AuthHandler:          authHandler,
@@ -68,6 +71,7 @@ func main() {
 		JobsHandler:          jobsHandler,
 		MatchingHandler:      matchingHandler,
 		ResponsesHandler:     responsesHandler,
+		AssignmentsHandler:   assignmentsHandler,
 		JWTSecret:            cfg.JWTSecret,
 	})
 

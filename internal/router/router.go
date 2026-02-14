@@ -19,6 +19,7 @@ type Deps struct {
 	JobsHandler          *handler.JobsHandler
 	MatchingHandler      *handler.MatchingHandler
 	ResponsesHandler     *handler.ResponsesHandler
+	AssignmentsHandler   *handler.AssignmentsHandler
 	JWTSecret            string
 }
 
@@ -53,6 +54,7 @@ func New(deps Deps) *chi.Mux {
 		r.Get("/jobs", deps.JobsHandler.List)
 		r.Get("/jobs/{id}", deps.JobsHandler.GetByID)
 		r.Get("/matching/jobs/{jobId}/contractors", deps.MatchingHandler.MatchByJobID)
+		r.Get("/assignments/job/{jobId}", deps.AssignmentsHandler.ListByJob)
 
 		r.Group(func(r chi.Router) {
 			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))
@@ -67,6 +69,8 @@ func New(deps Deps) *chi.Mux {
 			r.Post("/jobs/{id}/cancel", deps.JobsHandler.Cancel)
 			r.Post("/jobs/{id}/complete", deps.JobsHandler.Complete)
 			r.Post("/jobs/{id}/duplicate", deps.JobsHandler.Duplicate)
+			r.Post("/assignments", deps.AssignmentsHandler.Create)
+			r.Patch("/assignments/{id}/status", deps.AssignmentsHandler.UpdateStatus)
 		})
 
 		r.Group(func(r chi.Router) {
