@@ -21,6 +21,7 @@ type Deps struct {
 	ResponsesHandler     *handler.ResponsesHandler
 	AssignmentsHandler   *handler.AssignmentsHandler
 	RatingsHandler       *handler.RatingsHandler
+	ComplianceHandler    *handler.ComplianceHandler
 	JWTSecret            string
 }
 
@@ -58,6 +59,7 @@ func New(deps Deps) *chi.Mux {
 		r.Get("/assignments/job/{jobId}", deps.AssignmentsHandler.ListByJob)
 		r.Get("/ratings/contractor/{contractorId}", deps.RatingsHandler.ListByContractor)
 		r.Get("/ratings/job/{jobId}", deps.RatingsHandler.ListByJob)
+		r.Get("/compliance/blacklist", deps.ComplianceHandler.ListBlacklist)
 
 		r.Group(func(r chi.Router) {
 			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))
@@ -75,6 +77,7 @@ func New(deps Deps) *chi.Mux {
 			r.Post("/assignments", deps.AssignmentsHandler.Create)
 			r.Patch("/assignments/{id}/status", deps.AssignmentsHandler.UpdateStatus)
 			r.Post("/ratings", deps.RatingsHandler.Create)
+			r.Delete("/compliance/blacklist/{id}", deps.ComplianceHandler.DeleteBlacklistEntry)
 		})
 
 		r.Group(func(r chi.Router) {

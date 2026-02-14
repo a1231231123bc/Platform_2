@@ -1,4 +1,4 @@
-# Реализация Этапов 1-10
+# Реализация Этапов 1-11
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -362,4 +362,32 @@ make test
 - `internal/dto/rating_test.go`
   - валидация DTO create
   - валидация диапазона score
+- `go test ./...` — PASS
+
+## Этап 11: Комплаенс (compliance)
+
+### Что реализовано
+
+- `internal/repository/contractor_blacklist.go`
+  - добавлены методы:
+    - `FindAllByOrganization`
+    - `DeleteInOrganization`
+- `internal/service/compliance.go`
+  - `ListBlacklist`
+  - `DeleteBlacklistEntry`
+  - валидация UUID для `blacklist id`
+- `internal/handler/compliance.go`
+  - endpoints для получения и удаления записей blacklist
+
+### Эндпоинты
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| GET | `/compliance/blacklist` | JWT | Список blacklist организации |
+| DELETE | `/compliance/blacklist/{id}` | JWT + role | Удалить запись из blacklist |
+
+`role` для delete: `ADMIN | MANAGER`.
+
+### Тесты
+
 - `go test ./...` — PASS
