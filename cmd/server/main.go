@@ -39,12 +39,20 @@ func main() {
 
 	userRepo := repository.NewUserRepository(pool)
 	orgRepo := repository.NewOrganizationRepository(pool)
+
 	authService := service.NewAuthService(userRepo, orgRepo, cfg)
+	usersService := service.NewUsersService(userRepo)
+	orgService := service.NewOrganizationsService(orgRepo)
+
 	authHandler := handler.NewAuthHandler(authService)
+	usersHandler := handler.NewUsersHandler(usersService)
+	orgHandler := handler.NewOrganizationsHandler(orgService)
 
 	r := router.New(router.Deps{
-		AuthHandler: authHandler,
-		JWTSecret:   cfg.JWTSecret,
+		AuthHandler:          authHandler,
+		UsersHandler:         usersHandler,
+		OrganizationsHandler: orgHandler,
+		JWTSecret:            cfg.JWTSecret,
 	})
 
 	srv := &http.Server{

@@ -14,8 +14,10 @@ import (
 
 func TestHealthCheck(t *testing.T) {
 	r := New(Deps{
-		AuthHandler: handler.NewAuthHandler(nil),
-		JWTSecret:   "test-secret",
+		AuthHandler:          handler.NewAuthHandler(nil),
+		UsersHandler:         handler.NewUsersHandler(nil),
+		OrganizationsHandler: handler.NewOrganizationsHandler(nil),
+		JWTSecret:            "test-secret",
 	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -33,8 +35,10 @@ func TestHealthCheck(t *testing.T) {
 
 func TestCORS(t *testing.T) {
 	r := New(Deps{
-		AuthHandler: handler.NewAuthHandler(nil),
-		JWTSecret:   "test-secret",
+		AuthHandler:          handler.NewAuthHandler(nil),
+		UsersHandler:         handler.NewUsersHandler(nil),
+		OrganizationsHandler: handler.NewOrganizationsHandler(nil),
+		JWTSecret:            "test-secret",
 	})
 
 	req := httptest.NewRequest(http.MethodOptions, "/", nil)

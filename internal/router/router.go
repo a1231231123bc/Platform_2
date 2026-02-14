@@ -12,8 +12,10 @@ import (
 )
 
 type Deps struct {
-	AuthHandler *handler.AuthHandler
-	JWTSecret   string
+	AuthHandler          *handler.AuthHandler
+	UsersHandler         *handler.UsersHandler
+	OrganizationsHandler *handler.OrganizationsHandler
+	JWTSecret            string
 }
 
 func New(deps Deps) *chi.Mux {
@@ -35,6 +37,20 @@ func New(deps Deps) *chi.Mux {
 		r.Use(mw.JWTAuth(deps.JWTSecret))
 
 		r.Get("/auth/me", deps.AuthHandler.GetMe)
+		r.Get("/users", deps.UsersHandler.List)
+		r.Get("/users/{id}", deps.UsersHandler.GetByID)
+		r.Get("/organizations/{id}", deps.OrganizationsHandler.GetByID)
+
+		r.Group(func(r chi.Router) {
+			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))
+			r.Patch("/users/{id}", deps.UsersHandler.Update)
+			r.Patch("/organizations/{id}", deps.OrganizationsHandler.Update)
+		})
+
+		r.Group(func(r chi.Router) {
+			r.Use(mw.RequireRoles("ADMIN"))
+			r.Delete("/users/{id}", deps.UsersHandler.Delete)
+		})
 	})
 
 	return r

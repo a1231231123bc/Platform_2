@@ -48,6 +48,23 @@ func (r *UserRepository) FindByID(ctx context.Context, id string) (*models.User,
 	return &u, nil
 }
 
+func (r *UserRepository) FindByIDAndOrganization(ctx context.Context, id, organizationID string) (*models.User, error) {
+	var u models.User
+	err := r.pool.QueryRow(ctx,
+		`SELECT id, email, password_hash, name, role, organization_id, created_at, updated_at
+		 FROM users
+		 WHERE id = $1 AND organization_id = $2`,
+		id, organizationID,
+	).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Name, &u.Role, &u.OrganizationID, &u.CreatedAt, &u.UpdatedAt)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("find user by id and organization: %w", err)
+	}
+	return &u, nil
+}
+
 func (r *UserRepository) Create(ctx context.Context, tx pgx.Tx, email, passwordHash, name string, role models.UserRole, organizationID string) (*models.User, error) {
 	var u models.User
 	err := tx.QueryRow(ctx,
@@ -102,10 +119,40 @@ func (r *UserRepository) Update(ctx context.Context, id string, name *string, ro
 	return &u, nil
 }
 
+func (r *UserRepository) UpdateInOrganization(ctx context.Context, id, organizationID string, name *string, role *string) (*models.User, error) {
+	var u models.User
+	err := r.pool.QueryRow(ctx,
+		`UPDATE users SET
+			name = COALESCE($3, name),
+			role = COALESCE($4::user_role, role)
+		 WHERE id = $1 AND organization_id = $2
+		 RETURNING id, email, password_hash, name, role, organization_id, created_at, updated_at`,
+		id, organizationID, name, role,
+	).Scan(&u.ID, &u.Email, &u.PasswordHash, &u.Name, &u.Role, &u.OrganizationID, &u.CreatedAt, &u.UpdatedAt)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("update user in organization: %w", err)
+	}
+	return &u, nil
+}
+
 func (r *UserRepository) Delete(ctx context.Context, id string) error {
 	ct, err := r.pool.Exec(ctx, `DELETE FROM users WHERE id = $1`, id)
 	if err != nil {
 		return fmt.Errorf("delete user: %w", err)
+	}
+	if ct.RowsAffected() == 0 {
+		return pgx.ErrNoRows
+	}
+	return nil
+}
+
+func (r *UserRepository) DeleteInOrganization(ctx context.Context, id, organizationID string) error {
+	ct, err := r.pool.Exec(ctx, `DELETE FROM users WHERE id = $1 AND organization_id = $2`, id, organizationID)
+	if err != nil {
+		return fmt.Errorf("delete user in organization: %w", err)
 	}
 	if ct.RowsAffected() == 0 {
 		return pgx.ErrNoRows
