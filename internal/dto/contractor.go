@@ -35,3 +35,8 @@ type QueryContractorsRequest struct {
 	Page        int     `json:"page" validate:"min=1"`
 	Limit       int     `json:"limit" validate:"min=1,max=100"`
 }
+
+// AddToBlacklistRequest is the request body for POST /contractors/:id/blacklist.
+type AddToBlacklistRequest struct {
+	Reason *string `json:"reason"`
+}

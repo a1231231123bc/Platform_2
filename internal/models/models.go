@@ -212,6 +212,14 @@ type ContractorBlacklistWithContractor struct {
 	Contractor Contractor `json:"contractor"`
 }
 
+type ContractorHistoryItem struct {
+	Source     string    `json:"source"`
+	JobID      string    `json:"jobId"`
+	JobTitle   string    `json:"jobTitle"`
+	Status     string    `json:"status"`
+	HappenedAt time.Time `json:"happenedAt"`
+}
+
 type Rating struct {
 	ID                 string           `json:"id"`
 	JobID              string           `json:"jobId"`

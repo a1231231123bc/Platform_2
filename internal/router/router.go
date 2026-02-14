@@ -15,6 +15,7 @@ type Deps struct {
 	AuthHandler          *handler.AuthHandler
 	UsersHandler         *handler.UsersHandler
 	OrganizationsHandler *handler.OrganizationsHandler
+	ContractorsHandler   *handler.ContractorsHandler
 	JWTSecret            string
 }
 
@@ -40,11 +41,17 @@ func New(deps Deps) *chi.Mux {
 		r.Get("/users", deps.UsersHandler.List)
 		r.Get("/users/{id}", deps.UsersHandler.GetByID)
 		r.Get("/organizations/{id}", deps.OrganizationsHandler.GetByID)
+		r.Get("/contractors", deps.ContractorsHandler.List)
+		r.Get("/contractors/{id}", deps.ContractorsHandler.GetByID)
+		r.Get("/contractors/{id}/history", deps.ContractorsHandler.History)
 
 		r.Group(func(r chi.Router) {
 			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))
 			r.Patch("/users/{id}", deps.UsersHandler.Update)
 			r.Patch("/organizations/{id}", deps.OrganizationsHandler.Update)
+			r.Post("/contractors", deps.ContractorsHandler.Create)
+			r.Patch("/contractors/{id}", deps.ContractorsHandler.Update)
+			r.Post("/contractors/{id}/blacklist", deps.ContractorsHandler.AddToBlacklist)
 		})
 
 		r.Group(func(r chi.Router) {
