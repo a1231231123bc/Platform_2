@@ -1,4 +1,4 @@
-# Реализация Этапов 1-11
+# Реализация Этапов 1-12
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -390,4 +390,29 @@ make test
 
 ### Тесты
 
+- `go test ./...` — PASS
+
+## Этап 12: Уведомления (notifications)
+
+### Что реализовано
+
+- `internal/repository/communication_log.go`
+  - создание записи `communication_logs`
+  - получение логов по подрядчику с пагинацией
+- `internal/service/notifications.go`
+  - `CreateLog`
+  - `ListByContractor`
+  - валидация contractor/job UUID
+  - валидация `direction` (`OUTGOING`/`INCOMING`)
+  - проверка существования подрядчика
+
+### Примечание по API
+
+На этом этапе отдельный HTTP-контроллер не добавлялся.
+Модуль сделан как сервисный слой, который вызывается другими модулями.
+
+### Тесты
+
+- `internal/service/notifications_test.go`
+  - валидация parser-а направления коммуникации
 - `go test ./...` — PASS
