@@ -17,6 +17,7 @@ type Deps struct {
 	OrganizationsHandler *handler.OrganizationsHandler
 	ContractorsHandler   *handler.ContractorsHandler
 	JobsHandler          *handler.JobsHandler
+	MatchingHandler      *handler.MatchingHandler
 	JWTSecret            string
 }
 
@@ -47,6 +48,7 @@ func New(deps Deps) *chi.Mux {
 		r.Get("/contractors/{id}/history", deps.ContractorsHandler.History)
 		r.Get("/jobs", deps.JobsHandler.List)
 		r.Get("/jobs/{id}", deps.JobsHandler.GetByID)
+		r.Get("/matching/jobs/{jobId}/contractors", deps.MatchingHandler.MatchByJobID)
 
 		r.Group(func(r chi.Router) {
 			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))

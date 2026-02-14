@@ -1,4 +1,4 @@
-# Реализация Этапов 1-6
+# Реализация Этапов 1-7
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -237,4 +237,32 @@ make test
 ### Тесты
 
 - `internal/handler/jobs_test.go`
+- `go test ./...` — PASS
+
+## Этап 7: Подбор исполнителей (matching)
+
+### Что реализовано
+
+- `internal/repository/matching.go`
+  - выбор доступных подрядчиков (`is_available = true`)
+  - матч по региону (`region = ANY(regions)`)
+  - матч по типу оборудования (`equipment_types @> ARRAY[equipmentType]`), если у job задан `equipmentType`
+- `internal/service/matching.go`
+  - поиск работы по `jobId` в scope организации
+  - валидация UUID
+  - возврат списка подходящих подрядчиков
+- `internal/handler/matching.go`
+  - endpoint подбора по job id
+
+### Эндпоинт
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| GET | `/matching/jobs/{jobId}/contractors` | JWT | Подходящие подрядчики для работы |
+
+### Тесты
+
+- `internal/repository/matching_test.go`
+  - build фильтров с `equipmentType`
+  - build фильтров без `equipmentType`
 - `go test ./...` — PASS

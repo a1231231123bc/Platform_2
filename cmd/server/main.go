@@ -48,12 +48,14 @@ func main() {
 	orgService := service.NewOrganizationsService(orgRepo)
 	contractorsService := service.NewContractorsService(contractorRepo, blacklistRepo)
 	jobsService := service.NewJobsService(jobRepo)
+	matchingService := service.NewMatchingService(jobRepo, contractorRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
 	usersHandler := handler.NewUsersHandler(usersService)
 	orgHandler := handler.NewOrganizationsHandler(orgService)
 	contractorsHandler := handler.NewContractorsHandler(contractorsService)
 	jobsHandler := handler.NewJobsHandler(jobsService)
+	matchingHandler := handler.NewMatchingHandler(matchingService)
 
 	r := router.New(router.Deps{
 		AuthHandler:          authHandler,
@@ -61,6 +63,7 @@ func main() {
 		OrganizationsHandler: orgHandler,
 		ContractorsHandler:   contractorsHandler,
 		JobsHandler:          jobsHandler,
+		MatchingHandler:      matchingHandler,
 		JWTSecret:            cfg.JWTSecret,
 	})
 
