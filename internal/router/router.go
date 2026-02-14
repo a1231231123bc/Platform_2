@@ -22,6 +22,7 @@ type Deps struct {
 	AssignmentsHandler   *handler.AssignmentsHandler
 	RatingsHandler       *handler.RatingsHandler
 	ComplianceHandler    *handler.ComplianceHandler
+	AnalyticsHandler     *handler.AnalyticsHandler
 	JWTSecret            string
 }
 
@@ -60,6 +61,7 @@ func New(deps Deps) *chi.Mux {
 		r.Get("/ratings/contractor/{contractorId}", deps.RatingsHandler.ListByContractor)
 		r.Get("/ratings/job/{jobId}", deps.RatingsHandler.ListByJob)
 		r.Get("/compliance/blacklist", deps.ComplianceHandler.ListBlacklist)
+		r.Get("/analytics/dashboard", deps.AnalyticsHandler.Dashboard)
 
 		r.Group(func(r chi.Router) {
 			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))

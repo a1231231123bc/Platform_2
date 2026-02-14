@@ -1,4 +1,4 @@
-# Реализация Этапов 1-12
+# Реализация Этапов 1-13
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -415,4 +415,31 @@ make test
 
 - `internal/service/notifications_test.go`
   - валидация parser-а направления коммуникации
+- `go test ./...` — PASS
+
+## Этап 13: Аналитика (analytics)
+
+### Что реализовано
+
+- `internal/repository/analytics.go`
+  - агрегированные метрики дашборда по организации:
+    - `totalJobs`
+    - `activeJobs` (`ACTIVE` + `IN_PROGRESS`)
+    - `totalContractors` (distinct contractors по назначениям организации)
+    - `totalAssignments`
+- `internal/service/analytics.go`
+  - `Dashboard`
+- `internal/handler/analytics.go`
+  - endpoint дашборда
+
+### Эндпоинт
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| GET | `/analytics/dashboard` | JWT | Метрики дашборда организации |
+
+### Тесты
+
+- `internal/repository/analytics_test.go`
+  - проверка JSON-контракта ответа метрик
 - `go test ./...` — PASS
