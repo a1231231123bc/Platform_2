@@ -12,7 +12,10 @@ import (
 
 	"platform/internal/config"
 	"platform/internal/database"
+	"platform/internal/handler"
+	"platform/internal/repository"
 	"platform/internal/router"
+	"platform/internal/service"
 )
 
 func main() {
@@ -34,9 +37,15 @@ func main() {
 	}
 	defer pool.Close()
 
-	_ = pool // will be used by repositories
+	userRepo := repository.NewUserRepository(pool)
+	orgRepo := repository.NewOrganizationRepository(pool)
+	authService := service.NewAuthService(userRepo, orgRepo, cfg)
+	authHandler := handler.NewAuthHandler(authService)
 
-	r := router.New()
+	r := router.New(router.Deps{
+		AuthHandler: authHandler,
+		JWTSecret:   cfg.JWTSecret,
+	})
 
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Port),

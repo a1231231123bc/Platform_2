@@ -6,12 +6,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"platform/internal/handler"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestHealthCheck(t *testing.T) {
-	r := New()
+	r := New(Deps{
+		AuthHandler: handler.NewAuthHandler(nil),
+		JWTSecret:   "test-secret",
+	})
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
@@ -27,7 +32,10 @@ func TestHealthCheck(t *testing.T) {
 }
 
 func TestCORS(t *testing.T) {
-	r := New()
+	r := New(Deps{
+		AuthHandler: handler.NewAuthHandler(nil),
+		JWTSecret:   "test-secret",
+	})
 
 	req := httptest.NewRequest(http.MethodOptions, "/", nil)
 	w := httptest.NewRecorder()

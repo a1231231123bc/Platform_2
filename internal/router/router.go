@@ -4,11 +4,19 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"platform/internal/handler"
+	mw "platform/internal/middleware"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func New() *chi.Mux {
+type Deps struct {
+	AuthHandler *handler.AuthHandler
+	JWTSecret   string
+}
+
+func New(deps Deps) *chi.Mux {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -17,6 +25,17 @@ func New() *chi.Mux {
 	r.Use(corsMiddleware)
 
 	r.Get("/", healthCheck)
+
+	// Auth routes (public)
+	r.Post("/auth/register", deps.AuthHandler.Register)
+	r.Post("/auth/login", deps.AuthHandler.Login)
+
+	// Protected routes
+	r.Group(func(r chi.Router) {
+		r.Use(mw.JWTAuth(deps.JWTSecret))
+
+		r.Get("/auth/me", deps.AuthHandler.GetMe)
+	})
 
 	return r
 }
