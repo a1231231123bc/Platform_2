@@ -18,6 +18,7 @@ func TestHealthCheck(t *testing.T) {
 		UsersHandler:         handler.NewUsersHandler(nil),
 		OrganizationsHandler: handler.NewOrganizationsHandler(nil),
 		ContractorsHandler:   handler.NewContractorsHandler(nil),
+		JobsHandler:          handler.NewJobsHandler(nil),
 		JWTSecret:            "test-secret",
 	})
 
@@ -40,6 +41,7 @@ func TestCORS(t *testing.T) {
 		UsersHandler:         handler.NewUsersHandler(nil),
 		OrganizationsHandler: handler.NewOrganizationsHandler(nil),
 		ContractorsHandler:   handler.NewContractorsHandler(nil),
+		JobsHandler:          handler.NewJobsHandler(nil),
 		JWTSecret:            "test-secret",
 	})
 

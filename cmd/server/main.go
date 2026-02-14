@@ -41,22 +41,26 @@ func main() {
 	orgRepo := repository.NewOrganizationRepository(pool)
 	contractorRepo := repository.NewContractorRepository(pool)
 	blacklistRepo := repository.NewContractorBlacklistRepository(pool)
+	jobRepo := repository.NewJobRepository(pool)
 
 	authService := service.NewAuthService(userRepo, orgRepo, cfg)
 	usersService := service.NewUsersService(userRepo)
 	orgService := service.NewOrganizationsService(orgRepo)
 	contractorsService := service.NewContractorsService(contractorRepo, blacklistRepo)
+	jobsService := service.NewJobsService(jobRepo)
 
 	authHandler := handler.NewAuthHandler(authService)
 	usersHandler := handler.NewUsersHandler(usersService)
 	orgHandler := handler.NewOrganizationsHandler(orgService)
 	contractorsHandler := handler.NewContractorsHandler(contractorsService)
+	jobsHandler := handler.NewJobsHandler(jobsService)
 
 	r := router.New(router.Deps{
 		AuthHandler:          authHandler,
 		UsersHandler:         usersHandler,
 		OrganizationsHandler: orgHandler,
 		ContractorsHandler:   contractorsHandler,
+		JobsHandler:          jobsHandler,
 		JWTSecret:            cfg.JWTSecret,
 	})
 

@@ -16,6 +16,7 @@ type Deps struct {
 	UsersHandler         *handler.UsersHandler
 	OrganizationsHandler *handler.OrganizationsHandler
 	ContractorsHandler   *handler.ContractorsHandler
+	JobsHandler          *handler.JobsHandler
 	JWTSecret            string
 }
 
@@ -44,6 +45,8 @@ func New(deps Deps) *chi.Mux {
 		r.Get("/contractors", deps.ContractorsHandler.List)
 		r.Get("/contractors/{id}", deps.ContractorsHandler.GetByID)
 		r.Get("/contractors/{id}/history", deps.ContractorsHandler.History)
+		r.Get("/jobs", deps.JobsHandler.List)
+		r.Get("/jobs/{id}", deps.JobsHandler.GetByID)
 
 		r.Group(func(r chi.Router) {
 			r.Use(mw.RequireRoles("ADMIN", "MANAGER"))
@@ -52,6 +55,12 @@ func New(deps Deps) *chi.Mux {
 			r.Post("/contractors", deps.ContractorsHandler.Create)
 			r.Patch("/contractors/{id}", deps.ContractorsHandler.Update)
 			r.Post("/contractors/{id}/blacklist", deps.ContractorsHandler.AddToBlacklist)
+			r.Post("/jobs", deps.JobsHandler.Create)
+			r.Patch("/jobs/{id}", deps.JobsHandler.Update)
+			r.Post("/jobs/{id}/publish", deps.JobsHandler.Publish)
+			r.Post("/jobs/{id}/cancel", deps.JobsHandler.Cancel)
+			r.Post("/jobs/{id}/complete", deps.JobsHandler.Complete)
+			r.Post("/jobs/{id}/duplicate", deps.JobsHandler.Duplicate)
 		})
 
 		r.Group(func(r chi.Router) {
