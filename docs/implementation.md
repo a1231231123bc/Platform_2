@@ -1,4 +1,4 @@
-# Реализация Этапов 1-7
+# Реализация Этапов 1-8
 
 Этот файл содержит сводную документацию по уже выполненным этапам миграции.
 
@@ -265,4 +265,34 @@ make test
 - `internal/repository/matching_test.go`
   - build фильтров с `equipmentType`
   - build фильтров без `equipmentType`
+- `go test ./...` — PASS
+
+## Этап 8: Отклики (responses)
+
+### Что реализовано
+
+- `internal/repository/job_offer.go`
+  - поиск оффера по токену (`FindByToken`)
+  - смена статуса оффера по токену (`UpdateStatusByToken`)
+- `internal/service/responses.go`
+  - `GetByToken`
+  - `Accept`
+  - `Decline`
+  - проверка формата token (UUID)
+  - ограничение на ответ только для офферов в статусе `SENT`
+- `internal/handler/responses.go`
+  - публичные обработчики без JWT
+
+### Эндпоинты
+
+| Метод | Путь | Auth | Описание |
+|-------|------|------|----------|
+| GET | `/responses/{token}` | - | Детали предложения |
+| POST | `/responses/{token}/accept` | - | Принять предложение |
+| POST | `/responses/{token}/decline` | - | Отклонить предложение |
+
+### Тесты
+
+- `internal/service/responses_test.go`
+  - проверка бизнес-правила respondable status (`SENT` only)
 - `go test ./...` — PASS

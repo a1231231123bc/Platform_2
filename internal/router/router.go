@@ -18,6 +18,7 @@ type Deps struct {
 	ContractorsHandler   *handler.ContractorsHandler
 	JobsHandler          *handler.JobsHandler
 	MatchingHandler      *handler.MatchingHandler
+	ResponsesHandler     *handler.ResponsesHandler
 	JWTSecret            string
 }
 
@@ -34,6 +35,9 @@ func New(deps Deps) *chi.Mux {
 	// Auth routes (public)
 	r.Post("/auth/register", deps.AuthHandler.Register)
 	r.Post("/auth/login", deps.AuthHandler.Login)
+	r.Get("/responses/{token}", deps.ResponsesHandler.GetByToken)
+	r.Post("/responses/{token}/accept", deps.ResponsesHandler.Accept)
+	r.Post("/responses/{token}/decline", deps.ResponsesHandler.Decline)
 
 	// Protected routes
 	r.Group(func(r chi.Router) {
